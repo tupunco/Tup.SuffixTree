@@ -21,21 +21,21 @@ namespace Tup.SuffixTree
         /// it to int[] take less memory because indexes are stored using native
         /// types.
         /// </summary>
-        private int[] data;
-        /**
-         * Represents index of the last position used in the data int[] array.
-         * 
-         * It should always be less than data.length
-         */
-        private int lastIdx = 0;
-        /**
-         * The starting size of the int[] array containing the payload
-         */
-        private static readonly int START_SIZE = 0;
-        /**
-         * The increment in size used when the payload array is full
-         */
-        private static readonly int INCREMENT = 1;
+        private ICollection<int> data;
+        ///**
+        // * Represents index of the last position used in the data int[] array.
+        // * 
+        // * It should always be less than data.length
+        // */
+        //private int lastIdx = 0;
+        ///**
+        // * The starting size of the int[] array containing the payload
+        // */
+        //private static readonly int START_SIZE = 0;
+        ///**
+        // * The increment in size used when the payload array is full
+        // */
+        //private static readonly int INCREMENT = 1;
         /**
          * The set of edges starting from this node
          */
@@ -63,7 +63,9 @@ namespace Tup.SuffixTree
         {
             edges = new EdgeBag();
             suffix = null;
-            data = new int[START_SIZE];
+            data = new HashSet<int>();
+            //data = new List<int>();
+            //data = new int[START_SIZE];
         }
 
         /**
@@ -148,7 +150,8 @@ namespace Tup.SuffixTree
          */
         private bool Contains(int index)
         {
-            return Array.BinarySearch(data, 0, lastIdx, index) >= 0;
+            return data.Contains(index);
+            //return Array.BinarySearch(data, 0, lastIdx, index) >= 0;
             //int low = 0;
             //int high = lastIdx - 1;
 
@@ -181,7 +184,10 @@ namespace Tup.SuffixTree
             ComputeAndCacheCountRecursive();
             return resultCount;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private ISet<int> ComputeAndCacheCountRecursive()
         {
             var ret = new HashSet<int>();
@@ -200,19 +206,18 @@ namespace Tup.SuffixTree
             resultCount = ret.Count;
             return ret;
         }
-
-        /**
-         * Returns the number of results that are stored on this node and on its
-         * children.
-         * Should be called after having called computeAndCacheCount.
-         * 
-         * @throws IllegalStateException when this method is called without having called
-         * computeAndCacheCount first
-         * @see Node#computeAndCacheCount() 
-         * @todo this should raise an exception when the subtree is changed but count
-         * wasn't updated
-         */
-        /// <exception cref="ArgumentException"></exception>
+        /// <summary>
+        /// Returns the number of results that are stored on this node and on its
+        /// children.
+        /// Should be called after having called computeAndCacheCount.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">when this method is called without having called computeAndCacheCount first</exception>
+        /// <remarks>
+        /// @see Node#computeAndCacheCount() 
+        /// @todo this should raise an exception when the subtree is changed but count
+        /// wasn't updated
+        /// </remarks>
         public int GetResultCount()
         {
             if (-1 == resultCount)
@@ -222,19 +227,30 @@ namespace Tup.SuffixTree
 
             return resultCount;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <param name="e"></param>
         internal void AddEdge(char ch, Edge e)
         {
             edges[ch] = e;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
         public Edge GetEdge(char ch)
         {
             Edge edge = null;
             edges.TryGetValue(ch, out edge);
             return edge;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public IDictionary<char, Edge> GetEdges()
         {
             return edges;
@@ -248,16 +264,20 @@ namespace Tup.SuffixTree
             set { this.suffix = value; }
             get { return suffix; }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="index"></param>
         private void AddIndex(int index)
         {
-            if (lastIdx == data.Length)
-            {
-                var copy = new int[data.Length + INCREMENT];
-                Array.Copy(data, 0, copy, 0, data.Length);
-                data = copy;
-            }
-            data[lastIdx++] = index;
+            data.Add(index);
+            //if (lastIdx == data.Length)
+            //{
+            //    var copy = new int[data.Length + INCREMENT];
+            //    Array.Copy(data, 0, copy, 0, data.Length);
+            //    data = copy;
+            //}
+            //data[lastIdx++] = index;
         }
     }
 }
